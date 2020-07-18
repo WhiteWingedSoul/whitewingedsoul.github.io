@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>My Own MyAnimeList</title>
+    <url>/20190817-My-Own-My-Anime-List/</url>
+    <content><![CDATA[<p>Summer in Japan is hot, way too hot it makes me stay at home the whole day with the air condition on. But staying at home the whole day without anything to do is kind of suck too, all the things that i’m working on has reached stalemate at this moment. My CV for the next job is currently being reviewed by my friend, the Book project i’ve been working on just isn’t going anywhere and current work just bores me out. I crave to try something new, something different, something that i make myself, that has meaning to it. Thinking of that reminds me of an idea i had along time ago, making an app where i can watch animes that i added into watch list in MAL. Yeah, something like that would be cool. So let’s get on to it.</p>
+<a id="more"></a>
+<h3 id="Data-crawling"><a href="#Data-crawling" class="headerlink" title="Data crawling"></a>Data crawling</h3><p>To build this app, first of all i need to collect my personal list from MAL. After a quick look up, apparently MAL at this moment doesn’t have public api where i can query my data. (They are planning to release one half a year from now on, so by the time you read this, go check it out to see if it’s available yet) So crawling the site is necessary, luckily the site itself is not a SPA, so a python script would work just fine. The idea is to write a function to crawl my data from MAL, deploy it to a serverless function and schedule it to run everyday.</p>
+<p>I’m already familiar with AWS Lambda, using it again would be boring. Let’s check out what Google Cloud has to offer.</p>
+<p>Google Cloud Function turned out to be quite similar to AWS Lambda Function, so setting one up wasn’t too hard. So was getting the necessary data. </p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">execute</span><span class="params">(event, context)</span>:</span></span><br><span class="line">    page = requests.get(<span class="string">f'https://myanimelist.net/animelist/<span class="subst">&#123;user_name&#125;</span>?status=7'</span>)</span><br><span class="line">    tree = html.fromstring(page.text)</span><br><span class="line">    html_element = tree.xpath(<span class="string">".//table[@class='list-table']"</span>)</span><br><span class="line">    data = json.loads(html_element[<span class="number">0</span>].attrib[<span class="string">'data-items'</span>])</span><br></pre></td></tr></table></figure>
+<p>Alright, next challenge is to find a database to store above data. My goal is to make this app run as long as possible, so priority is to find the cheapest database service possible. Since they offer free tier up to 1GB storage (which is more than enough for my personal usage), Google Cloud Datastore fits right into the criteria.</p>
+<p>Added a few tweaks to above python script and it’s done !</p>
+<img src="/20190817-My-Own-My-Anime-List/mal_data.png">
+<h3 id="Back-end"><a href="#Back-end" class="headerlink" title="Back end"></a>Back end</h3><p>The next step is building a backend api, same as the crawler service, will be built on top of Google Cloud Function. This time i went with Node, so Express is the framework of choice. I’ve never built a node app from scratch, so i spent a bit of time studying tutorials of how to make a minimum express server. Fortunenately, <a href="http://expressjs.com/en/guide/routing.html" target="_blank" rel="noopener">this</a> and <a href="https://github.com/babel/example-node-server" target="_blank" rel="noopener">this</a> helped out alot with the initial setup.</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"mal-api"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"Backend API for My Anime List web app"</span>,</span><br><span class="line">  <span class="attr">"main"</span>: <span class="string">"app.js"</span>,</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"babel src -d dist"</span>,</span><br><span class="line">    <span class="attr">"start"</span>: <span class="string">"npm run build &amp;&amp; nodemon dist/app.js"</span>,</span><br><span class="line">    <span class="attr">"serve"</span>: <span class="string">"node dist/app.js"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"repository"</span>: &#123;</span><br><span class="line">    <span class="attr">"type"</span>: <span class="string">"git"</span>,</span><br><span class="line">    <span class="attr">"url"</span>: <span class="string">"git@me.github.com:WhiteWingedSoul/mal-api.git"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"author"</span>: <span class="string">"The lone dev"</span>,</span><br><span class="line">  <span class="attr">"license"</span>: <span class="string">"ISC"</span>,</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"express"</span>: <span class="string">"^4.17.1"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"@babel/cli"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"@babel/core"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"@babel/preset-env"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"nodemon"</span>: <span class="string">"^1.19.1"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+  </entry>
+  <entry>
+    <title>Journey of 2018</title>
+    <url>/20190102-Journey-of-2018/</url>
+    <content><![CDATA[<p>Hello and happy new year to everyone who happens to check out this blog.<br><a id="more"></a><br>2018 was a great journey, i’ve got to :</p>
+<ul>
+<li>meet inspirational people throughout events like VN Tech, VietPro, Rakuten Conference…<img src="/20190102-Journey-of-2018/rakuten.jpg"></li>
+<li>explore Google Japan office !!!</li>
+<li>work on different areas of software development</li>
+<li>move to a quiet place outside Tokyo to save money<img src="/20190102-Journey-of-2018/moving.jpg"></li>
+<li>me and my friends finished <a href="https://itunes.apple.com/us/app/suge-dict-tu-dien-nhat-viet/id1446211651" target="_blank" rel="noopener">our iOS app we had planned to do for a while</a></li>
+<li>and visit more places in Japan <img src="/20190102-Journey-of-2018/japan.jpg"></li>
+<li>and last but not least, <a href="https://thelonedev.com/20181110-how-this-site-was-made/">the first post on this blog</a></li>
+</ul>
+<p>Though i could not spend as much time as i originally intended on this blog, i do hope for that will no longer be the case in 2019, for this to be another phenomenon year as well, for me and for all of you who’s reading this blog.<br>So to begin the journey with a series of posts about Kotlin and all the technology i’ve been working with recently, starting from this one.</p>
+]]></content>
+      <tags>
+        <tag>life</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Trie for Finding Unique String in Two Files, Why Hashset Isn&#39;t a Good Idea for Large Data Sets</title>
+    <url>/20180826-Trie-for-finding-unique-string-in-two-files-why-hashset-isn-t-a-good-idea-for-large-data-sets/</url>
+    <content><![CDATA[]]></content>
+      <tags>
+        <tag>java</tag>
+        <tag>algorithm</tag>
+        <tag>trie</tag>
+        <tag>hashset</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>How This Site Was Made</title>
+    <url>/20181110-how-this-site-was-made/</url>
+    <content><![CDATA[<h4 id="Foreword"><a href="#Foreword" class="headerlink" title="Foreword"></a>Foreword</h4><p>I’ve made this blog quite for quite sometime, following the trend of blogging about tech, daily life style in Japan between my uni friends. Yet, i’ve never actually contributed anything to this blog, or anywhere else. Part of me think it was due to the inability to express myself to others, as well as inexperience in any area of knowledge. But deep down inside i know it’s just an excuse for my laziness, and the ignorance of it was the same as letting go of a oppurtunity for improving myself. </p>
+<p>So no longer, from today onward, i’ll force myself to write, no matter how shallowed and foolish the content it maybe, no matter how crappy my English may sound like, i’ll write, and improve upon.</p>
+<p>Thus, begin the first post on this blog. How this site was made.</p>
+<a id="more"></a>
+<h1 id="Installing-Hexo"><a href="#Installing-Hexo" class="headerlink" title="Installing Hexo"></a>Installing Hexo</h1><p>First, i checked the list of prerequisite preparation</p>
+<ul>
+<li>a Mac or Linux Operating System, with an Unix shell</li>
+<li>node.js</li>
+<li>Git</li>
+</ul>
+<p>After that, installed hexo comand line interface</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+<p>Created blog project folder</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ hexo init thelondev</span><br><span class="line">$ cd thelonedev</span><br><span class="line">$ npm install</span><br></pre></td></tr></table></figure>
+<p>After the installation was finished, deployed the hexo blog with</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">hexo server</span><br></pre></td></tr></table></figure>
+<p>Woala!</p>
+<img src="/20181110-how-this-site-was-made/default_hexo_blog.png" title="Default Hexo Blog Site">
+<p>After this step, it’s possible to start writing.</p>
+<h5 id="But-wait-that-was-all-of-it"><a href="#But-wait-that-was-all-of-it" class="headerlink" title="But wait, that was all of it"></a>But wait, that was all of it</h5><p>Having a default blog is nice and all, but it would be boring and would’t define what thelonedev is.<br>So it was time for customization.</p>
+<p>There are 2 approach to this. One can do it from scratch, customizing html, css, js and make their own ideal blog site.<br>The other is to use an already existed custom theme. I’m more of a lazy one, so i fell to this category, and NexT was my choice.</p>
+<h1 id="Installing-NexT-theme"><a href="#Installing-NexT-theme" class="headerlink" title="Installing NexT theme"></a>Installing NexT theme</h1><p>Installation took place in project folder</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/theme-next/hexo-theme-next themes/next</span><br></pre></td></tr></table></figure>
+<p>After i pulled next repo into my blog project folder, i changed the <code>_config.yml</code> file to switch to NexT theme.</p>
+<p><em>Note: There are many other customization that can be made by changing <code>_config.yml</code> file such as site description, writting style, index, date&amp;time format ….. although those won’t be covered in this blog post, it’s easy enough that i believe you can do it on your own and customize your site further more</em></p>
+<img src="/20181110-how-this-site-was-made/next_config.png" title="Change default theme to NexT">
+<p>After applied change to <code>_config.yml</code> file, i had to reboot hexo server in order for change to take place.</p>
+<p>And it turned out quite nice.</p>
+<img src="/20181110-how-this-site-was-made/next-theme-blog.png" title="NexT theme Hexo Blog">
+<p>There are 4 different schemes that can be used in NexT theme: Muse, Mist, Pisces and Gemini.<br>My choice was Mist.</p>
+<p>Changed the scheme option in <code>themes/next/_config.yml</code> by uncommenting Mist line</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># Schemes</span><br><span class="line"># scheme: Muse</span><br><span class="line">scheme: Mist</span><br><span class="line"># scheme: Pisces</span><br><span class="line"># scheme: Gemini</span><br></pre></td></tr></table></figure>
+<img src="/20181110-how-this-site-was-made/hexo-mist-scheme.png" title="NexT theme Hexo Blog">
+<p>That was all what needed to create this blog. Though it would be meaningless if i can only run it locally.<br>So i had to deploy it to a Github Page.</p>
+<h1 id="Deploy"><a href="#Deploy" class="headerlink" title="Deploy"></a>Deploy</h1><p>For all of those who’s unawared, Github allows you to host one of your site, on the domain username.github.io . All you need to do is create a new repository named username.github.io, push your site source code there and let Github take care of the rest.<br>More information regards this <a href="https://pages.github.com/" target="_blank" rel="noopener">can be found in here</a>.</p>
+<p>Now, back to main topic, hexo provides a deploy method to github. First, install <a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">hexo-deployer-git</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+<p>Change deploy config in <code>_config.yml</code></p>
+<img src="/20181110-how-this-site-was-made/deploy.png" title="Deploy Config">
+<p>And enter below command</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">hexo deploy</span><br></pre></td></tr></table></figure>
+<p>Once i finished with above steps, <strong>thelonedev</strong> was available to access at <a href="https://whitewingedsoul.github.io" target="_blank" rel="noopener">whitewingedsoul.github.io</a></p>
+<p>… though as you noticed, clicking on the above link redirected you to <a href="https://thelonedev.com">thelonedev.com</a>. To use a custom domain with github page. You have to follow the below extra steps.</p>
+<h1 id="Custom-domain"><a href="#Custom-domain" class="headerlink" title="Custom domain"></a>Custom domain</h1><p>First thing first, this procedure will cost you money. So if you don’t mind using github subdomain for your site, you should stop here and start having fun with your own blog !</p>
+<p>But, if you are determined to get your own brand, you have to purchase a domain. There are many domain registrars where you can purchase domain, notably Namecheap, GoDaddy, Google, Onamae… Their price don’t differ that much so just choose the one you like.</p>
+<p>I chose <a href="https://www.onamae.com/" target="_blank" rel="noopener">Onamae</a> to purchase thelonedev so i don’t have to deal with the hassle converting yen to foreign currency. </p>
+<img src="/20181110-how-this-site-was-made/purchase-domain.png">
+<p>After i got my thelonedev.com domain ready, i added it to my Github Page setting.<br>Go to <code>Your Project Name &gt; Settings &gt; Github Pages &gt; Custom domain</code> and add the custom domain you’ve purchased.</p>
+<img src="/20181110-how-this-site-was-made/custom-domain.png">
+<p>And finally, i went to onamae configuration page to set up my apex domain.</p>
+<p>Created A records with following addresses</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">185.199.108.153</span><br><span class="line">185.199.109.153</span><br><span class="line">185.199.110.153</span><br><span class="line">185.199.111.153</span><br></pre></td></tr></table></figure>
+<img src="/20181110-how-this-site-was-made/configure-a-records.png">
+<p>You may have to wait for at most 24 hours for DNS changes to take place.<br>And that was all it takes to make this website lives at <a href="https://thelonedev.com">thelonedev.com</a>. </p>
+<p>I hope this has been helpful to spark up your writting journey. </p>
+]]></content>
+      <tags>
+        <tag>blogging</tag>
+        <tag>hexo</tag>
+        <tag>next</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Kotlin - Configuring a Mutli-Modules Project With Gradle</title>
+    <url>/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/</url>
+    <content><![CDATA[<p>For the last couple of days, i’ve been trying to write the introduction for this post, but so far it has been going no where at all. Turn out, writting blog is way more difficult than i thought. I had a vague idea about what i want to write, but i couldn’t find the right words to express it, to make it sounds intelligently. And then i remembered a lesson from a <a href="https://www.amazon.com/s?k=9788180320217" target="_blank" rel="noopener">book of Dale Carnegie i’ve been reading lately</a>.</p>
+<blockquote>
+<p>First, arouse in the other person an eager want. He who can do this has the whole world with him. He who cannot walks a lonely way.</p>
+</blockquote>
+<blockquote>
+<p>“You can make more friends in two months by being interested in them, than in two years by making them interested in you.” The only way to make quality, lasting friendships is to learn to be genuinely interested in them and their interests</p>
+</blockquote>
+<p> I realized, i was too focus on trying to show how literate, knowledgable i am rather than actually providing useful knowledge to you readers. I was thinking in term of what i want to show, not what you want to see when you google your way to this blog. That’s not helpful to anybody, not even to myself. So i need to forget my perspective, my ego and try to write this post simple, and easy to understand as possible. With 3 questions to understand the subject: <strong>What</strong>, <strong>Why</strong> and <strong>How</strong>.</p>
+<a id="more"></a>
+<h1 id="What"><a href="#What" class="headerlink" title="What"></a>What</h1><p>In this post, i’ll show you how to create and configure a multi-project build with Gradle and Kotlin language. The project will consists of 3 sub projects: presentation, core and persistence. Each has its own purpose and can be used independantly.</p>
+<p><a href="#How">Click here to go straight to #How where i explain step by step how to do it</a>.</p>
+<h1 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h1><p>Splitting code into modules give you the following advantages:</p>
+<ol>
+<li><p><strong>Separation of concern -&gt; Increase readibility, maintainability &amp; decrease complexity</strong>. </p>
+<blockquote>
+<p>Code that you do not have to change is less likely to break than code that you do change. So splitting up the concerns helps you to avoid breakage in unrelated features</p>
+</blockquote>
+<p> Instead of putting everything in one place, <strong>each module</strong> is <strong>separated from one another</strong> and <strong>has only one job</strong>. For example, the module in charge of presentation logic is separated from core business logic, and both are separated from persistence logic. By decoupling the dependency between modules and focusing on the sole unified purpose it serves, code and logic inside said modules can be easier to understand and maintain by even fresher developer while keeping complexity in check, which in turn promotes its reusability and scalibility.</p>
+<p> A real life example, when i first designed a multi-project system for my company. It was a webapp so i splitted it into 3 modules api - to take in charge of webserver related config &amp; handle all request coming, core - where our business logic lie and database - to connect to a Redshift instance and perform CRUD operation. Four months later, the need arised that we need to make another copy of this system, but this time with data store in Clickhouse. Instead of having to rewrite the whole project, all i need was to fork the current system, make another database module and replace the current one with it, without breaking any logic flow from api and core module. </p>
+<p> Following that, we decided that we need a mobile version of the current webapp. Same as usecase above, only the api module is needed to be replaced. Changes that normally covers the whole system got reduced to only parts that are actually changed, by clear separation of concerns.</p>
+</li>
+<li><p><strong>Reusability</strong><br><strong>Each module</strong> serves a single purpose, <strong>is independant from others</strong> and <strong>can be deployed separately</strong>. So should the need arise, you can easily copy a module right to another project, without the need of any special tinkering.</p>
+</li>
+</ol>
+<ol start="3">
+<li><p><strong>Faster individual development time -&gt; By reduce wasted build &amp; test time</strong><br>Splitting code into modules gives you the oppoturnity to take advantage of <a href="https://guides.gradle.org/performance/" target="_blank" rel="noopener">Gradle’s parallel execution</a> feature, so multiple <strong>builds can be executed simultaneously</strong>. Also since they are separated, you don’t need to worry about breaking other modules when making changes to one. Only the <strong>changed module is needed to be rebuilt and tested</strong> instead of recompling the whole project. This can drastically reduce wait time when Gradle executes build process, makes development go faster.</p>
+<p> Dependency to 3rd parties is also kept in check, each module depends on different set of dependencies. By exposing dependencies to only module that actually uses it, you can keep build size small, plus reduce the chance of any error or side effect. (Two dependencies having same class name can be mistook for one another for example)</p>
+</li>
+</ol>
+<ol start="4">
+<li><strong>Faster team development time -&gt; By enabling team collaboration</strong><br>One major advantage of using multi-module design is that it is an effective way for developers to collaborate. As i mentioned earlier each module has a specific purpose and is independant from others. Change occur to one module will not affect others. So multiple modules can be developed by different people at the same time without any problem. </li>
+</ol>
+<h1 id="How"><a href="#How" class="headerlink" title="How"></a>How</h1><p>Let’s start by creating a new Gradle Project. </p>
+<img src="/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/new_project.png">
+<p>You should get something that roughly looks like this (But definitely not exactly the same !)</p>
+<img src="/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/inited_project.png">]]></content>
+      <tags>
+        <tag>kotlin</tag>
+        <tag>gradle</tag>
+        <tag>build</tag>
+      </tags>
+  </entry>
+</search>

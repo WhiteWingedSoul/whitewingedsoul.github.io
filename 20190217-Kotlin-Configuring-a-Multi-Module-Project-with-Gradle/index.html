@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source Sans Pro:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
+  
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.2">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.1.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.1.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.1.2">
+
+
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg?v=7.1.2" color="#222">
+
+
+
+  <meta name="msapplication-config" content="/images/browserconfig.xml">
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="For the last couple of days, i’ve been trying to write the introduction for this post, but so far it has been going no where at all. Turn out, writting blog is way more difficult than i thought. I had">
+<meta name="keywords" content="kotlin,gradle,build">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin - Configuring a Mutli-Modules Project With Gradle">
+<meta property="og:url" content="https://thelonedev.com/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/index.html">
+<meta property="og:site_name" content="A lone developer | Blogging to fight procrastination">
+<meta property="og:description" content="For the last couple of days, i’ve been trying to write the introduction for this post, but so far it has been going no where at all. Turn out, writting blog is way more difficult than i thought. I had">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://thelonedev.com/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/new_project.png">
+<meta property="og:image" content="https://thelonedev.com/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/inited_project.png">
+<meta property="og:updated_time" content="2020-07-18T14:47:25.840Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kotlin - Configuring a Mutli-Modules Project With Gradle">
+<meta name="twitter:description" content="For the last couple of days, i’ve been trying to write the introduction for this post, but so far it has been going no where at all. Turn out, writting blog is way more difficult than i thought. I had">
+<meta name="twitter:image" content="https://thelonedev.com/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/new_project.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://thelonedev.com/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Kotlin - Configuring a Mutli-Modules Project With Gradle | A lone developer | Blogging to fight procrastination</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">A lone developer | Blogging to fight procrastination</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">Good Code ? Bad Code ? Codeless Code !</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">5</span></a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/WhiteWingedSoul" class="github-corner" title="Here, go check it out !" aria-label="Here, go check it out !" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://thelonedev.com/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="viethd">
+      <meta itemprop="description" content="Just a software engineer wannabe. I'm hiding in the basement waiting to see the world someday.">
+      <meta itemprop="image" content="https://avatars2.githubusercontent.com/u/12512031?s=400&u=f2411120e3edf2b9ed329ba3b37493ca69e10ce3&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="A lone developer | Blogging to fight procrastination">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Kotlin - Configuring a Mutli-Modules Project With Gradle
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-02-17 22:43:00" itemprop="dateCreated datePublished" datetime="2019-02-17T22:43:00+09:00">2019-02-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2020-07-18 23:47:25" itemprop="dateModified" datetime="2020-07-18T23:47:25+09:00">2020-07-18</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>For the last couple of days, i’ve been trying to write the introduction for this post, but so far it has been going no where at all. Turn out, writting blog is way more difficult than i thought. I had a vague idea about what i want to write, but i couldn’t find the right words to express it, to make it sounds intelligently. And then i remembered a lesson from a <a href="https://www.amazon.com/s?k=9788180320217" target="_blank" rel="noopener">book of Dale Carnegie i’ve been reading lately</a>.</p>
+<blockquote>
+<p>First, arouse in the other person an eager want. He who can do this has the whole world with him. He who cannot walks a lonely way.</p>
+</blockquote>
+<blockquote>
+<p>“You can make more friends in two months by being interested in them, than in two years by making them interested in you.” The only way to make quality, lasting friendships is to learn to be genuinely interested in them and their interests</p>
+</blockquote>
+<p> I realized, i was too focus on trying to show how literate, knowledgable i am rather than actually providing useful knowledge to you readers. I was thinking in term of what i want to show, not what you want to see when you google your way to this blog. That’s not helpful to anybody, not even to myself. So i need to forget my perspective, my ego and try to write this post simple, and easy to understand as possible. With 3 questions to understand the subject: <strong>What</strong>, <strong>Why</strong> and <strong>How</strong>.</p>
+<a id="more"></a>
+<h1 id="What"><a href="#What" class="headerlink" title="What"></a>What</h1><p>In this post, i’ll show you how to create and configure a multi-project build with Gradle and Kotlin language. The project will consists of 3 sub projects: presentation, core and persistence. Each has its own purpose and can be used independantly.</p>
+<p><a href="#How">Click here to go straight to #How where i explain step by step how to do it</a>.</p>
+<h1 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h1><p>Splitting code into modules give you the following advantages:</p>
+<ol>
+<li><p><strong>Separation of concern -&gt; Increase readibility, maintainability &amp; decrease complexity</strong>. </p>
+<blockquote>
+<p>Code that you do not have to change is less likely to break than code that you do change. So splitting up the concerns helps you to avoid breakage in unrelated features</p>
+</blockquote>
+<p> Instead of putting everything in one place, <strong>each module</strong> is <strong>separated from one another</strong> and <strong>has only one job</strong>. For example, the module in charge of presentation logic is separated from core business logic, and both are separated from persistence logic. By decoupling the dependency between modules and focusing on the sole unified purpose it serves, code and logic inside said modules can be easier to understand and maintain by even fresher developer while keeping complexity in check, which in turn promotes its reusability and scalibility.</p>
+<p> A real life example, when i first designed a multi-project system for my company. It was a webapp so i splitted it into 3 modules api - to take in charge of webserver related config &amp; handle all request coming, core - where our business logic lie and database - to connect to a Redshift instance and perform CRUD operation. Four months later, the need arised that we need to make another copy of this system, but this time with data store in Clickhouse. Instead of having to rewrite the whole project, all i need was to fork the current system, make another database module and replace the current one with it, without breaking any logic flow from api and core module. </p>
+<p> Following that, we decided that we need a mobile version of the current webapp. Same as usecase above, only the api module is needed to be replaced. Changes that normally covers the whole system got reduced to only parts that are actually changed, by clear separation of concerns.</p>
+</li>
+<li><p><strong>Reusability</strong><br><strong>Each module</strong> serves a single purpose, <strong>is independant from others</strong> and <strong>can be deployed separately</strong>. So should the need arise, you can easily copy a module right to another project, without the need of any special tinkering.</p>
+</li>
+</ol>
+<ol start="3">
+<li><p><strong>Faster individual development time -&gt; By reduce wasted build &amp; test time</strong><br>Splitting code into modules gives you the oppoturnity to take advantage of <a href="https://guides.gradle.org/performance/" target="_blank" rel="noopener">Gradle’s parallel execution</a> feature, so multiple <strong>builds can be executed simultaneously</strong>. Also since they are separated, you don’t need to worry about breaking other modules when making changes to one. Only the <strong>changed module is needed to be rebuilt and tested</strong> instead of recompling the whole project. This can drastically reduce wait time when Gradle executes build process, makes development go faster.</p>
+<p> Dependency to 3rd parties is also kept in check, each module depends on different set of dependencies. By exposing dependencies to only module that actually uses it, you can keep build size small, plus reduce the chance of any error or side effect. (Two dependencies having same class name can be mistook for one another for example)</p>
+</li>
+</ol>
+<ol start="4">
+<li><strong>Faster team development time -&gt; By enabling team collaboration</strong><br>One major advantage of using multi-module design is that it is an effective way for developers to collaborate. As i mentioned earlier each module has a specific purpose and is independant from others. Change occur to one module will not affect others. So multiple modules can be developed by different people at the same time without any problem. </li>
+</ol>
+<h1 id="How"><a href="#How" class="headerlink" title="How"></a>How</h1><p>Let’s start by creating a new Gradle Project. </p>
+<img src="/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/new_project.png">
+<p>You should get something that roughly looks like this (But definitely not exactly the same !)</p>
+<img src="/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/inited_project.png">
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/kotlin/" rel="tag"># kotlin</a>
+          
+            <a href="/tags/gradle/" rel="tag"># gradle</a>
+          
+            <a href="/tags/build/" rel="tag"># build</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/20190102-Journey-of-2018/" rel="next" title="Journey of 2018">
+                <i class="fa fa-chevron-left"></i> Journey of 2018
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/20190817-My-Own-My-Anime-List/" rel="prev" title="My Own MyAnimeList">
+                My Own MyAnimeList <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars2.githubusercontent.com/u/12512031?s=400&u=f2411120e3edf2b9ed329ba3b37493ca69e10ce3&v=4" alt="viethd">
+            
+              <p class="site-author-name" itemprop="name">viethd</p>
+              <div class="site-description motion-element" itemprop="description">Just a software engineer wannabe. I'm hiding in the basement waiting to see the world someday.</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/WhiteWingedSoul" title="GitHub &rarr; https://github.com/WhiteWingedSoul" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:cooro1994@gmail.com" title="Email &rarr; mailto:cooro1994@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>Email</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/WhiteWingedSoul" title="Twitter &rarr; https://twitter.com/WhiteWingedSoul" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.facebook.com/WhiteWingedSoul" title="Facebook &rarr; https://www.facebook.com/WhiteWingedSoul" rel="noopener" target="_blank"><i class="fa fa-fw fa-facebook"></i>Facebook</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.linkedin.com/in/hoang-duc-viet/" title="Linkedin &rarr; https://www.linkedin.com/in/hoang-duc-viet/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#What"><span class="nav-number">1.</span> <span class="nav-text">What</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Why"><span class="nav-number">2.</span> <span class="nav-text">Why</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#How"><span class="nav-number">3.</span> <span class="nav-text">How</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-address-card"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Viet Hoang</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">The Lone Dev, All Rights Reserved.</div>
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.2"></script>
+
+  <script src="/js/motion.js?v=7.1.2"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.2"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.2"></script>
+<script src="/js/post-details.js?v=7.1.2"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.2"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').not('.gist .highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      const selection = document.getSelection();
+      const selected = selection.rangeCount > 0 ? selection.getRangeAt(0) : false;
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+      if (selected) {
+        selection.removeAllRanges();
+        selection.addRange(selected);
+      }
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('Copy');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

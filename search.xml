@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>My Own MyAnimeList</title>
-    <url>/20190817-My-Own-My-Anime-List/</url>
-    <content><![CDATA[<p>Summer in Japan is hot, way too hot it makes me stay at home the whole day with the air condition on. But staying at home the whole day without anything to do is kind of suck too, all the things that i’m working on has reached stalemate at this moment. My CV for the next job is currently being reviewed by my friend, the Book project i’ve been working on just isn’t going anywhere and current work just bores me out. I crave to try something new, something different, something that i make myself, that has meaning to it. Thinking of that reminds me of an idea i had along time ago, making an app where i can watch animes that i added into watch list in MAL. Yeah, something like that would be cool. So let’s get on to it.</p>
-<a id="more"></a>
-<h3 id="Data-crawling"><a href="#Data-crawling" class="headerlink" title="Data crawling"></a>Data crawling</h3><p>To build this app, first of all i need to collect my personal list from MAL. After a quick look up, apparently MAL at this moment doesn’t have public api where i can query my data. (They are planning to release one half a year from now on, so by the time you read this, go check it out to see if it’s available yet) So crawling the site is necessary, luckily the site itself is not a SPA, so a python script would work just fine. The idea is to write a function to crawl my data from MAL, deploy it to a serverless function and schedule it to run everyday.</p>
-<p>I’m already familiar with AWS Lambda, using it again would be boring. Let’s check out what Google Cloud has to offer.</p>
-<p>Google Cloud Function turned out to be quite similar to AWS Lambda Function, so setting one up wasn’t too hard. So was getting the necessary data. </p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">execute</span><span class="params">(event, context)</span>:</span></span><br><span class="line">    page = requests.get(<span class="string">f'https://myanimelist.net/animelist/<span class="subst">&#123;user_name&#125;</span>?status=7'</span>)</span><br><span class="line">    tree = html.fromstring(page.text)</span><br><span class="line">    html_element = tree.xpath(<span class="string">".//table[@class='list-table']"</span>)</span><br><span class="line">    data = json.loads(html_element[<span class="number">0</span>].attrib[<span class="string">'data-items'</span>])</span><br></pre></td></tr></table></figure>
-<p>Alright, next challenge is to find a database to store above data. My goal is to make this app run as long as possible, so priority is to find the cheapest database service possible. Since they offer free tier up to 1GB storage (which is more than enough for my personal usage), Google Cloud Datastore fits right into the criteria.</p>
-<p>Added a few tweaks to above python script and it’s done !</p>
-<img src="/20190817-My-Own-My-Anime-List/mal_data.png">
-<h3 id="Back-end"><a href="#Back-end" class="headerlink" title="Back end"></a>Back end</h3><p>The next step is building a backend api, same as the crawler service, will be built on top of Google Cloud Function. This time i went with Node, so Express is the framework of choice. I’ve never built a node app from scratch, so i spent a bit of time studying tutorials of how to make a minimum express server. Fortunenately, <a href="http://expressjs.com/en/guide/routing.html" target="_blank" rel="noopener">this</a> and <a href="https://github.com/babel/example-node-server" target="_blank" rel="noopener">this</a> helped out alot with the initial setup.</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"mal-api"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"Backend API for My Anime List web app"</span>,</span><br><span class="line">  <span class="attr">"main"</span>: <span class="string">"app.js"</span>,</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"babel src -d dist"</span>,</span><br><span class="line">    <span class="attr">"start"</span>: <span class="string">"npm run build &amp;&amp; nodemon dist/app.js"</span>,</span><br><span class="line">    <span class="attr">"serve"</span>: <span class="string">"node dist/app.js"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"repository"</span>: &#123;</span><br><span class="line">    <span class="attr">"type"</span>: <span class="string">"git"</span>,</span><br><span class="line">    <span class="attr">"url"</span>: <span class="string">"git@me.github.com:WhiteWingedSoul/mal-api.git"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"author"</span>: <span class="string">"The lone dev"</span>,</span><br><span class="line">  <span class="attr">"license"</span>: <span class="string">"ISC"</span>,</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"express"</span>: <span class="string">"^4.17.1"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"@babel/cli"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"@babel/core"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"@babel/preset-env"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"nodemon"</span>: <span class="string">"^1.19.1"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-  </entry>
-  <entry>
     <title>Journey of 2018</title>
     <url>/20190102-Journey-of-2018/</url>
     <content><![CDATA[<p>Hello and happy new year to everyone who happens to check out this blog.<br><a id="more"></a><br>2018 was a great journey, i’ve got to :</p>
@@ -34,6 +18,67 @@
       <tags>
         <tag>life</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Kotlin - Configuring a Mutli-Modules Project With Gradle</title>
+    <url>/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/</url>
+    <content><![CDATA[<p>For the last couple of days, i’ve been trying to write the introduction for this post, but so far it has been going no where at all. Turn out, writting blog is way more difficult than i thought. I had a vague idea about what i want to write, but i couldn’t find the right words to express it, to make it sounds intelligently. And then i remembered a lesson from a <a href="https://www.amazon.com/s?k=9788180320217" target="_blank" rel="noopener">book of Dale Carnegie i’ve been reading lately</a>.</p>
+<blockquote>
+<p>First, arouse in the other person an eager want. He who can do this has the whole world with him. He who cannot walks a lonely way.</p>
+</blockquote>
+<blockquote>
+<p>“You can make more friends in two months by being interested in them, than in two years by making them interested in you.” The only way to make quality, lasting friendships is to learn to be genuinely interested in them and their interests</p>
+</blockquote>
+<p> I realized, i was too focus on trying to show how literate, knowledgable i am rather than actually providing useful knowledge to you readers. I was thinking in term of what i want to show, not what you want to see when you google your way to this blog. That’s not helpful to anybody, not even to myself. So i need to forget my perspective, my ego and try to write this post simple, and easy to understand as possible. With 3 questions to understand the subject: <strong>What</strong>, <strong>Why</strong> and <strong>How</strong>.</p>
+<a id="more"></a>
+<h1 id="What"><a href="#What" class="headerlink" title="What"></a>What</h1><p>In this post, i’ll show you how to create and configure a multi-project build with Gradle and Kotlin language. The project will consists of 3 sub projects: presentation, core and persistence. Each has its own purpose and can be used independantly.</p>
+<p><a href="#How">Click here to go straight to #How where i explain step by step how to do it</a>.</p>
+<h1 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h1><p>Splitting code into modules give you the following advantages:</p>
+<ol>
+<li><p><strong>Separation of concern -&gt; Increase readibility, maintainability &amp; decrease complexity</strong>. </p>
+<blockquote>
+<p>Code that you do not have to change is less likely to break than code that you do change. So splitting up the concerns helps you to avoid breakage in unrelated features</p>
+</blockquote>
+<p> Instead of putting everything in one place, <strong>each module</strong> is <strong>separated from one another</strong> and <strong>has only one job</strong>. For example, the module in charge of presentation logic is separated from core business logic, and both are separated from persistence logic. By decoupling the dependency between modules and focusing on the sole unified purpose it serves, code and logic inside said modules can be easier to understand and maintain by even fresher developer while keeping complexity in check, which in turn promotes its reusability and scalibility.</p>
+<p> A real life example, when i first designed a multi-project system for my company. It was a webapp so i splitted it into 3 modules api - to take in charge of webserver related config &amp; handle all request coming, core - where our business logic lie and database - to connect to a Redshift instance and perform CRUD operation. Four months later, the need arised that we need to make another copy of this system, but this time with data store in Clickhouse. Instead of having to rewrite the whole project, all i need was to fork the current system, make another database module and replace the current one with it, without breaking any logic flow from api and core module. </p>
+<p> Following that, we decided that we need a mobile version of the current webapp. Same as usecase above, only the api module is needed to be replaced. Changes that normally covers the whole system got reduced to only parts that are actually changed, by clear separation of concerns.</p>
+</li>
+<li><p><strong>Reusability</strong><br><strong>Each module</strong> serves a single purpose, <strong>is independant from others</strong> and <strong>can be deployed separately</strong>. So should the need arise, you can easily copy a module right to another project, without the need of any special tinkering.</p>
+</li>
+</ol>
+<ol start="3">
+<li><p><strong>Faster individual development time -&gt; By reduce wasted build &amp; test time</strong><br>Splitting code into modules gives you the oppoturnity to take advantage of <a href="https://guides.gradle.org/performance/" target="_blank" rel="noopener">Gradle’s parallel execution</a> feature, so multiple <strong>builds can be executed simultaneously</strong>. Also since they are separated, you don’t need to worry about breaking other modules when making changes to one. Only the <strong>changed module is needed to be rebuilt and tested</strong> instead of recompling the whole project. This can drastically reduce wait time when Gradle executes build process, makes development go faster.</p>
+<p> Dependency to 3rd parties is also kept in check, each module depends on different set of dependencies. By exposing dependencies to only module that actually uses it, you can keep build size small, plus reduce the chance of any error or side effect. (Two dependencies having same class name can be mistook for one another for example)</p>
+</li>
+</ol>
+<ol start="4">
+<li><strong>Faster team development time -&gt; By enabling team collaboration</strong><br>One major advantage of using multi-module design is that it is an effective way for developers to collaborate. As i mentioned earlier each module has a specific purpose and is independant from others. Change occur to one module will not affect others. So multiple modules can be developed by different people at the same time without any problem. </li>
+</ol>
+<h1 id="How"><a href="#How" class="headerlink" title="How"></a>How</h1><p>Let’s start by creating a new Gradle Project. </p>
+<img src="/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/new_project.png">
+<p>You should get something that roughly looks like this (But definitely not exactly the same !)</p>
+<img src="/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/inited_project.png">]]></content>
+      <tags>
+        <tag>kotlin</tag>
+        <tag>gradle</tag>
+        <tag>build</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>My Own MyAnimeList</title>
+    <url>/20190817-My-Own-My-Anime-List/</url>
+    <content><![CDATA[<p>Summer in Japan is hot, way too hot it makes me stay at home the whole day with the air condition on. But staying at home the whole day without anything to do is kind of suck too, all the things that i’m working on has reached stalemate at this moment. My CV for the next job is currently being reviewed by my friend, the Book project i’ve been working on just isn’t going anywhere and current work just bores me out. I crave to try something new, something different, something that i make myself, that has meaning to it. Thinking of that reminds me of an idea i had along time ago, making an app where i can watch animes that i added into watch list in MAL. Yeah, something like that would be cool. So let’s get on to it.</p>
+<a id="more"></a>
+<h3 id="Data-crawling"><a href="#Data-crawling" class="headerlink" title="Data crawling"></a>Data crawling</h3><p>To build this app, first of all i need to collect my personal list from MAL. After a quick look up, apparently MAL at this moment doesn’t have public api where i can query my data. (They are planning to release one half a year from now on, so by the time you read this, go check it out to see if it’s available yet) So crawling the site is necessary, luckily the site itself is not a SPA, so a python script would work just fine. The idea is to write a function to crawl my data from MAL, deploy it to a serverless function and schedule it to run everyday.</p>
+<p>I’m already familiar with AWS Lambda, using it again would be boring. Let’s check out what Google Cloud has to offer.</p>
+<p>Google Cloud Function turned out to be quite similar to AWS Lambda Function, so setting one up wasn’t too hard. So was getting the necessary data. </p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">execute</span><span class="params">(event, context)</span>:</span></span><br><span class="line">    page = requests.get(<span class="string">f'https://myanimelist.net/animelist/<span class="subst">&#123;user_name&#125;</span>?status=7'</span>)</span><br><span class="line">    tree = html.fromstring(page.text)</span><br><span class="line">    html_element = tree.xpath(<span class="string">".//table[@class='list-table']"</span>)</span><br><span class="line">    data = json.loads(html_element[<span class="number">0</span>].attrib[<span class="string">'data-items'</span>])</span><br></pre></td></tr></table></figure>
+<p>Alright, next challenge is to find a database to store above data. My goal is to make this app run as long as possible, so priority is to find the cheapest database service possible. Since they offer free tier up to 1GB storage (which is more than enough for my personal usage), Google Cloud Datastore fits right into the criteria.</p>
+<p>Added a few tweaks to above python script and it’s done !</p>
+<img src="/20190817-My-Own-My-Anime-List/mal_data.png">
+<h3 id="Back-end"><a href="#Back-end" class="headerlink" title="Back end"></a>Back end</h3><p>The next step is building a backend api, same as the crawler service, will be built on top of Google Cloud Function. This time i went with Node, so Express is the framework of choice. I’ve never built a node app from scratch, so i spent a bit of time studying tutorials of how to make a minimum express server. Fortunenately, <a href="http://expressjs.com/en/guide/routing.html" target="_blank" rel="noopener">this</a> and <a href="https://github.com/babel/example-node-server" target="_blank" rel="noopener">this</a> helped out alot with the initial setup.</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"mal-api"</span>,</span><br><span class="line">  <span class="attr">"version"</span>: <span class="string">"1.0.0"</span>,</span><br><span class="line">  <span class="attr">"description"</span>: <span class="string">"Backend API for My Anime List web app"</span>,</span><br><span class="line">  <span class="attr">"main"</span>: <span class="string">"app.js"</span>,</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"babel src -d dist"</span>,</span><br><span class="line">    <span class="attr">"start"</span>: <span class="string">"npm run build &amp;&amp; nodemon dist/app.js"</span>,</span><br><span class="line">    <span class="attr">"serve"</span>: <span class="string">"node dist/app.js"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"repository"</span>: &#123;</span><br><span class="line">    <span class="attr">"type"</span>: <span class="string">"git"</span>,</span><br><span class="line">    <span class="attr">"url"</span>: <span class="string">"git@me.github.com:WhiteWingedSoul/mal-api.git"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"author"</span>: <span class="string">"The lone dev"</span>,</span><br><span class="line">  <span class="attr">"license"</span>: <span class="string">"ISC"</span>,</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"express"</span>: <span class="string">"^4.17.1"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"@babel/cli"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"@babel/core"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"@babel/preset-env"</span>: <span class="string">"^7.5.5"</span>,</span><br><span class="line">    <span class="attr">"nodemon"</span>: <span class="string">"^1.19.1"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
   </entry>
   <entry>
     <title>Trie for Finding Unique String in Two Files, Why Hashset Isn&#39;t a Good Idea for Large Data Sets</title>
@@ -109,51 +154,6 @@
         <tag>blogging</tag>
         <tag>hexo</tag>
         <tag>next</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Kotlin - Configuring a Mutli-Modules Project With Gradle</title>
-    <url>/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/</url>
-    <content><![CDATA[<p>For the last couple of days, i’ve been trying to write the introduction for this post, but so far it has been going no where at all. Turn out, writting blog is way more difficult than i thought. I had a vague idea about what i want to write, but i couldn’t find the right words to express it, to make it sounds intelligently. And then i remembered a lesson from a <a href="https://www.amazon.com/s?k=9788180320217" target="_blank" rel="noopener">book of Dale Carnegie i’ve been reading lately</a>.</p>
-<blockquote>
-<p>First, arouse in the other person an eager want. He who can do this has the whole world with him. He who cannot walks a lonely way.</p>
-</blockquote>
-<blockquote>
-<p>“You can make more friends in two months by being interested in them, than in two years by making them interested in you.” The only way to make quality, lasting friendships is to learn to be genuinely interested in them and their interests</p>
-</blockquote>
-<p> I realized, i was too focus on trying to show how literate, knowledgable i am rather than actually providing useful knowledge to you readers. I was thinking in term of what i want to show, not what you want to see when you google your way to this blog. That’s not helpful to anybody, not even to myself. So i need to forget my perspective, my ego and try to write this post simple, and easy to understand as possible. With 3 questions to understand the subject: <strong>What</strong>, <strong>Why</strong> and <strong>How</strong>.</p>
-<a id="more"></a>
-<h1 id="What"><a href="#What" class="headerlink" title="What"></a>What</h1><p>In this post, i’ll show you how to create and configure a multi-project build with Gradle and Kotlin language. The project will consists of 3 sub projects: presentation, core and persistence. Each has its own purpose and can be used independantly.</p>
-<p><a href="#How">Click here to go straight to #How where i explain step by step how to do it</a>.</p>
-<h1 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h1><p>Splitting code into modules give you the following advantages:</p>
-<ol>
-<li><p><strong>Separation of concern -&gt; Increase readibility, maintainability &amp; decrease complexity</strong>. </p>
-<blockquote>
-<p>Code that you do not have to change is less likely to break than code that you do change. So splitting up the concerns helps you to avoid breakage in unrelated features</p>
-</blockquote>
-<p> Instead of putting everything in one place, <strong>each module</strong> is <strong>separated from one another</strong> and <strong>has only one job</strong>. For example, the module in charge of presentation logic is separated from core business logic, and both are separated from persistence logic. By decoupling the dependency between modules and focusing on the sole unified purpose it serves, code and logic inside said modules can be easier to understand and maintain by even fresher developer while keeping complexity in check, which in turn promotes its reusability and scalibility.</p>
-<p> A real life example, when i first designed a multi-project system for my company. It was a webapp so i splitted it into 3 modules api - to take in charge of webserver related config &amp; handle all request coming, core - where our business logic lie and database - to connect to a Redshift instance and perform CRUD operation. Four months later, the need arised that we need to make another copy of this system, but this time with data store in Clickhouse. Instead of having to rewrite the whole project, all i need was to fork the current system, make another database module and replace the current one with it, without breaking any logic flow from api and core module. </p>
-<p> Following that, we decided that we need a mobile version of the current webapp. Same as usecase above, only the api module is needed to be replaced. Changes that normally covers the whole system got reduced to only parts that are actually changed, by clear separation of concerns.</p>
-</li>
-<li><p><strong>Reusability</strong><br><strong>Each module</strong> serves a single purpose, <strong>is independant from others</strong> and <strong>can be deployed separately</strong>. So should the need arise, you can easily copy a module right to another project, without the need of any special tinkering.</p>
-</li>
-</ol>
-<ol start="3">
-<li><p><strong>Faster individual development time -&gt; By reduce wasted build &amp; test time</strong><br>Splitting code into modules gives you the oppoturnity to take advantage of <a href="https://guides.gradle.org/performance/" target="_blank" rel="noopener">Gradle’s parallel execution</a> feature, so multiple <strong>builds can be executed simultaneously</strong>. Also since they are separated, you don’t need to worry about breaking other modules when making changes to one. Only the <strong>changed module is needed to be rebuilt and tested</strong> instead of recompling the whole project. This can drastically reduce wait time when Gradle executes build process, makes development go faster.</p>
-<p> Dependency to 3rd parties is also kept in check, each module depends on different set of dependencies. By exposing dependencies to only module that actually uses it, you can keep build size small, plus reduce the chance of any error or side effect. (Two dependencies having same class name can be mistook for one another for example)</p>
-</li>
-</ol>
-<ol start="4">
-<li><strong>Faster team development time -&gt; By enabling team collaboration</strong><br>One major advantage of using multi-module design is that it is an effective way for developers to collaborate. As i mentioned earlier each module has a specific purpose and is independant from others. Change occur to one module will not affect others. So multiple modules can be developed by different people at the same time without any problem. </li>
-</ol>
-<h1 id="How"><a href="#How" class="headerlink" title="How"></a>How</h1><p>Let’s start by creating a new Gradle Project. </p>
-<img src="/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/new_project.png">
-<p>You should get something that roughly looks like this (But definitely not exactly the same !)</p>
-<img src="/20190217-Kotlin-Configuring-a-Multi-Module-Project-with-Gradle/inited_project.png">]]></content>
-      <tags>
-        <tag>kotlin</tag>
-        <tag>gradle</tag>
-        <tag>build</tag>
       </tags>
   </entry>
 </search>
